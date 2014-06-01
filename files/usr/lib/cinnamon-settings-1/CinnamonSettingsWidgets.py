@@ -4,10 +4,7 @@
 # two main types of settings (XletSettingsWidgets.py used for applets
 # and SettingsWidgets.py for system configuration).
 #
-# Widget components are handled by the Gtk framework internally. All
-# input widgets follow the layout [[prefix][gtk_widget][suffix]] where
-# prefix and suffix are optional instances of Gtk.Label, and gtk_widget
-# is the main interactable input component.
+# Widget components are handled by the Gtk framework internally.
 #
 # As part of a flexible framework, each type of widget accepts a varying
 # and optional list of named parameters:

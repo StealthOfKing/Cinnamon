@@ -20,7 +20,7 @@ class Module(CSW.Module):
 
     def on_module_selected(self):
         infos = createSystemInfos()                        
-        
+
         box = CSW.VBox()
         box.set_row_spacing(8)
         box.set_column_spacing(15)

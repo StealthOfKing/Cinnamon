@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# InputWidget is an extension of Gtk.Box that provides a common API for
+# InputWidget is an extension of Gtk.Grid that provides a common API for
 # all input widgets. It provides prefix, suffix, tooltip and visibility.
 # All child Gtk component widgets are stored with the gtk_ prefix.
 
@@ -32,6 +32,7 @@ class InputWidget(Gtk.Grid, Widget):
     #gtk_suffix
 
     def __init__(self, gtk_widget, **descriptor):
+        # Fixes some widgets... inparticular ComboBox.
         descriptor["align"] = descriptor.get("align", [0,0.5])
 
         # Automatically indent widgets with dependencies.
@@ -44,7 +45,6 @@ class InputWidget(Gtk.Grid, Widget):
         self.set_column_spacing(COLUMN_SPACING)
         self.set_row_spacing(ROW_SPACING)
 
-        components = []
 
         # Prefix, typically used for label.
         gtk_prefix = descriptor.pop("label", descriptor.pop("prefix", None))
@@ -55,20 +55,17 @@ class InputWidget(Gtk.Grid, Widget):
                 gtk_prefix.set_mnemonic_widget(gtk_widget)
             self.attach(gtk_prefix, 0, self.row, 1, 1)
             self.gtk_prefix = gtk_prefix
-            components.append(gtk_prefix)
         elif self.lock_width:   # A placeholder... the other option is to
             # recode the way containers add widgets and lock column widths.
             gtk_prefix = Gtk.Box()
             self.attach(gtk_prefix, 0, self.row, 1, 1)
             self.gtk_prefix = gtk_prefix
-            components.append(gtk_prefix)
 
         # Add the widget inbetween prefix and suffix.
         if gtk_widget:
             self.gtk_widget = gtk_widget
             gtk_widget.set_valign(Gtk.Align.CENTER)
             self.attach(gtk_widget, 1, self.row, 1, 1)
-            components.append(gtk_widget)
 
         # Suffix, typically used for units.
         gtk_suffix = descriptor.pop("units", descriptor.pop("suffix", None))
@@ -79,17 +76,6 @@ class InputWidget(Gtk.Grid, Widget):
                 gtk_suffix.set_mnemonic_widget(gtk_widget)
             self.attach(gtk_suffix, 2, self.row, 1, 1)
             self.gtk_suffix = gtk_suffix
-            components.append(gtk_suffix)
-
-        # Tooltip attached to full widget.
-        if "tooltip" in descriptor:
-            self.set_tooltip_text(descriptor["tooltip"])
-
-        # Visibility, show unless specified otherwise.
-        if "show" in descriptor and not descriptor["show"]:
-            self.hide()
-        else:
-            self.show()
 
         # Setting?
         if "setting" in descriptor:

@@ -36,7 +36,6 @@ CATEGORIES = [
 
 WIN_WIDTH = 800
 WIN_HEIGHT = 600
-WIN_H_PADDING = 20
 
 MIN_LABEL_WIDTH = 16
 MAX_LABEL_WIDTH = 25
@@ -165,9 +164,7 @@ class MainWindow:
                     for i in range(len(tabs)):
                         tab = tabs[i]
                         viewport = Gtk.Viewport()
-                        scroll_window = Gtk.ScrolledWindow()
-                        notebook.append_page(scroll_window, Gtk.Label.new(tab["title"]))
-                        scroll_window.add_with_viewport(viewport)
+                        notebook.append_page(viewport, Gtk.Label.new(tab["title"]))
                         module.tabs[tab["id"]] = viewport
                     notebook.expand = True
                 else:
@@ -188,14 +185,8 @@ class MainWindow:
             self.module_box.show_all()
             self.module_sw.show()
             self.button_back.show()
-            # Resize?
-            m, n = self.module_box.get_preferred_size()
-            width = n.width if n.width > WIN_WIDTH else WIN_WIDTH
-            bar_height = self.top_bar.get_preferred_size()[1].height
-            if hasattr(module, "height"):
-                self.window.resize(width, module.height + bar_height + WIN_H_PADDING)
-            else:
-                self.window.resize(width, n.height + bar_height + WIN_H_PADDING)
+
+            self.resize_to_fit_module(module)
         else:
             sidePage.build()
     def close_module(self):                     # Close the current settings module and return to icon view.
@@ -253,6 +244,15 @@ class MainWindow:
                     module[3] = False
             # Show this category if any modules match.
             category.show() if category.visible else category.hide()
+    def resize_to_fit_module(self, module):     # Resize the window to fit the current module.
+        # Resize?
+        m, n = self.module_box.get_preferred_size()
+        width = n.width if n.width > WIN_WIDTH else WIN_WIDTH
+        bar_height = self.top_bar.get_preferred_size()[1].height
+        if hasattr(module, "height"):
+            self.window.resize(width, module.height + bar_height)
+        else:
+            self.window.resize(width, n.height + bar_height)
 
     # General Navigation
     def on_button_back_clicked(self, widget):                       # Hook back button to return to System Settings.

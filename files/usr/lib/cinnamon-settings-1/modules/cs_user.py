@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import CinnamonSettingsWidgets as CSW
 from gi.repository import AccountsService, GLib, GObject, Gtk
 import PAM
@@ -10,13 +11,23 @@ import shutil
 import PIL
 
 class Module(CSW.Module):
+    id = "user"
     name = _("Account details")
     tooltip = _("Change your user preferences and password")
     keywords = _("user, account, information, details")
     icon = "cs-user"
     category = "prefs"
+    no_background = True
 
     def on_module_selected(self):
+        self.add(
+            CSW.Button(
+                image      = "/usr/share/cinnamon/faces/user-generic.png",
+                tooltip    = _("Click to change your picture"),
+                alignmnent = [0,0.5]
+            )
+        )
+        return
         self.face_button = Gtk.Button()
         self.face_image = Gtk.Image()  
         self.face_button.set_image(self.face_image)
@@ -117,7 +128,6 @@ class Module(CSW.Module):
         else:
             self.menu.attach(self.face_browse_menuitem, 0, 4, self.row+1, self.row+2)
 
-    
     def update_preview_cb (self, dialog, preview):      
         filename = dialog.get_preview_filename()
         dialog.set_preview_widget_active(False)

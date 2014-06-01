@@ -59,8 +59,11 @@ class Widget(object):
             self.set_halign(get_align(align[0]))
             self.set_valign(get_align(align[1]))
 
-        if "clicked" in descriptor:
-            self.connect("clicked", descriptor["clicked"])
+        if "classes" in descriptor:
+            classes = descriptor["classes"]
+            style_context = self.get_style_context()
+            for c in classes:
+                style_context.add_class(c)
 
         if "expand" in descriptor:
             self.set_hexpand(descriptor["expand"][0])
@@ -80,11 +83,12 @@ class Widget(object):
             self.set_margin_bottom(margin[2])
             self.set_margin_left  (margin[3])
 
-        if "classes" in descriptor:
-            classes = descriptor["classes"]
-            style_context = self.get_style_context()
-            for c in classes:
-                style_context.add_class(c)
+        if "tooltip" in descriptor:
+            self.set_tooltip_text(descriptor["tooltip"])
+
+        # Events
+        if "clicked" in descriptor:
+            self.connect("clicked", descriptor["clicked"])
 
     def validate_dependencies(self):    # Validate all dependencies and update this widget's sensitivity.
         dependencies = self.dependencies

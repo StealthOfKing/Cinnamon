@@ -20,6 +20,11 @@ class Button(InputWidget):
 
         InputWidget.__init__(self, button, **descriptor)
 
+        if "image" in descriptor:
+            self.gtk_button_image = Gtk.Image()  
+            button.set_image(self.gtk_button_image)
+            self.gtk_button_image.set_from_file(descriptor["image"])  
+
         self.gtk_widget.set_use_underline(True)
         if "text" in descriptor:
             self.gtk_widget.set_label(descriptor["text"])
