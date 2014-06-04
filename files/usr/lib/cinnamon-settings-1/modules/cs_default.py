@@ -87,11 +87,12 @@ class Module(CSW.Module):
                     align  = [0.5,0.5],
                     margin = [0,0,8,0]
                 ),
-                align           = [0.5,0],
                 indent_children = False
             ).add(
                 # For web, we need to support text/html, application/xhtml+xml and x-scheme-handler/https...
-                CSW.VBox(lock_widths=2).add(
+                CSW.Table(
+                    align = [0.5,0]
+                ).add(
                     *[ CSW.AppChooserButton(
                         label        = app_def["label"],
                         content_type = app_def["content_type"],
@@ -113,13 +114,11 @@ class Module(CSW.Module):
                     align  = [0.5,0.5],
                     margin = [0,0,8,0]
                 ),
-                lock_widths     = 0,
                 indent_children = False
             ).add(
-                CSW.VBox(
-                    depends     = ["!org.cinnamon.desktop.media-handling/autorun-never"],
-                    align       = [0.5,0],
-                    lock_widths = 2
+                CSW.Table(
+                    depends = ["!org.cinnamon.desktop.media-handling/autorun-never"],
+                    align   = [0.5,0]
                 ).add(
                     *[ CSW.MediaAppChooserButton(
                         label        = media_def["label"],
@@ -130,7 +129,8 @@ class Module(CSW.Module):
                     CSW.Button(
                         text    = _("_Other Media..."),
                         clicked = self.on_other_media_clicked
-                    )
+                    ),
+                    column = 1
                 ),
                 CSW.CheckButton(
                     setting = "org.cinnamon.desktop.media-handling/autorun-never",
@@ -166,10 +166,10 @@ class TerminalChooserButton(CSW.AppChooserButton):
 
     def set_value(self, value):
         value = value.split('/')[-1].split('.')[0]
-        model = self.gtk_widget.get_model()
+        model = self.get_model()
         for row in model:
             if value == row[1].split('/')[-1].split('.')[0]:
-                self.gtk_widget.set_active_custom_item(row[1])
+                self.set_active_custom_item(row[1])
                 return
 
 class OtherTypeDialog(Gtk.Dialog):
@@ -188,8 +188,7 @@ class OtherTypeDialog(Gtk.Dialog):
                 align       = [0.5,0.5],
                 margin      = [0,0,8,0]
             ),
-            align       = [0.5,0.5],
-            lock_widths = 2
+            align = [0.5,0.5]
         )
         # Type combo box for choosing the removable media type to configure.
         self.type_combo_box = CSW.ComboBox(
@@ -209,7 +208,7 @@ class OtherTypeDialog(Gtk.Dialog):
         self.application_combo_box = Pass()
         # on_type_changed() needs application_combo_box.destroy().
         self.application_combo_box.destroy = lambda:None
-        self.type_combo_box.gtk_widget.set_active(0)
+        self.type_combo_box.set_active(0)
 
     def accept_content_type(self, content_type):    # Include this content_type in dialog?
         if not content_type.startswith("x-content/"):

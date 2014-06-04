@@ -8,41 +8,45 @@
 from gi.repository import Gio, Gtk
 from InputWidget import InputWidget
 
-class AppChooserButton(InputWidget):
+class AppChooserButton(Gtk.AppChooserButton, InputWidget):
     also = False
 
     def __init__(self, **descriptor):
-        chooser = Gtk.AppChooserButton(content_type=descriptor.get("content_type", ""))
-        self.model = chooser.get_model()
-
-        # Show selected default app at top?
-        chooser.set_show_default_item(descriptor.get("default", True))
+        Gtk.AppChooserButton.__init__(self, content_type=descriptor.get("content_type", ""))
 
         if "options" in descriptor:
+            # Append the separator only if we have >= 1 apps in the chooser.
+            if self.get_app_info():
+                self.append_separator()
+
             options = descriptor["options"]
             for option in sorted(options, key=lambda option:option[1]):
-                chooser.append_custom_item(option[0], option[1], Gio.ThemedIcon.new(option[2] if len(option) >= 3 else ""))
+                print option[0]
+                self.append_custom_item(option[0], option[1], Gio.ThemedIcon.new(option[2] if len(option) >= 3 else ""))
+
+        InputWidget.__init__(self, **descriptor)
+
+        # Show selected default app at top?
+        self.set_show_default_item(descriptor.get("default", True))
 
         # Custom file dialog?
         if "dialog" in descriptor:
-            chooser.set_show_dialog_item(descriptor["dialog"])
+            self.set_show_dialog_item(descriptor["dialog"])
         if "heading" in descriptor:
-            chooser.set_heading(descriptor["heading"])
-
-        InputWidget.__init__(self, chooser, **descriptor)
+            self.set_heading(descriptor["heading"])
 
         if "also" in descriptor:
             self.also = descriptor["also"]
-            chooser.connect("changed", self.on_changed_also)
+            self.connect("changed", self.on_changed_also)
 
         if "setting" in descriptor:
-            self.changed = chooser.connect("changed", self.on_changed)
+            self.changed = self.connect("changed", AppChooserButton.on_changed)
 
-    def get_value(self):
-        current = self.model[self.gtk_widget.get_active_iter()]
+    def _get_value(self):
+        current = self.get_model()[self.get_active_iter()]
         return current[1] if current[4] else current[0].get_commandline()
-    def set_value(self, value):
-        self.gtk_widget.set_active_custom_item(value)
+    def _set_value(self, value):
+        self.set_active_custom_item(value)
 
     def on_changed_also(self, gtk_button):
         info = gtk_button.get_app_info()

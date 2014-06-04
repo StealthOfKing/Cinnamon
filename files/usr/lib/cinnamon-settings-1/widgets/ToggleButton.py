@@ -7,13 +7,13 @@ from InputWidget import InputWidget
 class ToggleButton(InputWidget):
     fallback = False
 
-    def __init__(self, gtk_widget, **descriptor):
-        InputWidget.__init__(self, gtk_widget, **descriptor)
+    def __init__(self, **descriptor):
+        InputWidget.__init__(self, **descriptor)
         if "setting" in descriptor:
-            self.changed = gtk_widget.connect('toggled', self.on_changed)
+            self.changed = self.connect('toggled', ToggleButton.on_changed)
 
-    def get_value(self):
-        return self.gtk_widget.get_active()
-    def set_value(self, value):
-        self.gtk_widget.set_active(value)
+    def _get_value(self):
+        return self.get_active()
+    def _set_value(self, value):
+        self.set_active(value)
 

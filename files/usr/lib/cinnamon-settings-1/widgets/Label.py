@@ -7,10 +7,10 @@ from Widget import Widget
 
 class Label(Gtk.Label, Widget):
     def __init__(self, *args, **descriptor):
+        descriptor["align"] = descriptor.pop("align", [0,0.5])
+
         Gtk.Label.__init__(self)
         Widget.__init__(self, **descriptor)
-
-        self.set_alignment(0,0.5)
 
         if "label" in descriptor:
             self.set_label(descriptor["label"])

@@ -33,7 +33,7 @@ class Module(CSW.Module):
         )
 
         section = CSW.Section(_("Auto Hide Options"))
-        layout_type = desktop_layout_combo_box.get_value()
+        layout_type = desktop_layout_combo_box._get_value()
         if layout_type != "classic":
             section.add(
                 CSW.CheckButton(

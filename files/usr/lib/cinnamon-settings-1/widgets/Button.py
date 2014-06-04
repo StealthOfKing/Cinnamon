@@ -5,32 +5,49 @@
 # Despite inheriting InputWidget, Button intentionally does not work
 # with Settings (schema/applet/key).
 
-from functools import partial
 from gi.repository import Gtk
 from InputWidget import InputWidget
 
-class Button(InputWidget):
+class Button(Gtk.Button, InputWidget):
     def __init__(self, **descriptor):
-        button = Gtk.Button()
+        descriptor["expand"] = [False,False]
+        Gtk.Button.__init__(self)
+        InputWidget.__init__(self, **descriptor)
+
         if "clicked" in descriptor:
-            button.connect("clicked", partial(descriptor["clicked"], self))
+            self.connect("clicked", descriptor["clicked"])
             del descriptor["clicked"]
 
-        descriptor["expand"] = [False,False]
-
-        InputWidget.__init__(self, button, **descriptor)
-
         if "image" in descriptor:
-            self.gtk_button_image = Gtk.Image()  
+            self.gtk_button_image = Gtk.Image()
+            self.gtk_button_image.set_from_file(descriptor["image"])
             button.set_image(self.gtk_button_image)
-            self.gtk_button_image.set_from_file(descriptor["image"])  
 
-        self.gtk_widget.set_use_underline(True)
+        if "menu" in descriptor:
+            self.connect("button-release-event", self.on_button_release_event_menu, descriptor["menu"])
+
+        self.set_use_underline(True)
         if "text" in descriptor:
-            self.gtk_widget.set_label(descriptor["text"])
+            self.set_label(descriptor["text"])
 
-#   def get_value(self):
+    def on_button_release_event_menu(self, button, event, menu):
+        if event.button == 1:
+            menu.popup(None, None, self.popup_menu_below_button, None, event.button, event.time)
+            menu.show_all()
+
+    def popup_menu_below_button (self, menu, data):
+        # Fetch coordinates of the button relative to window.
+        alloc = self.get_allocation()
+        # Convert coordinates to X11-relative.
+        unused_var, window_x, window_y = self.get_window().get_origin()
+
+        return (
+            window_x + alloc.x,
+            window_y + alloc.y + alloc.height,   # Move menu below.
+            True    # push_in is True, menu will remain inside screen.
+        )
+#   def _get_value(self):
 #       pass
-#   def set_value(self, value):
+#   def _set_value(self, value):
 #       pass
 

@@ -27,9 +27,15 @@ settings = Settings.get_settings("org.cinnamon.desktop.media-handling")
 class MediaAppChooserButton(AppChooserButton):
     def __init__(self, **descriptor):
         descriptor["default"] = descriptor.get("default", False)
+        descriptor["dialog"] = descriptor.get("dialog", True)
+        # Build extra menu options.
+        descriptor["options"] = descriptor.get("options", []) + [
+            [CUSTOM_ITEM_ASK,         _("Ask what to do"), "gtk-dialog-question"],
+            [CUSTOM_ITEM_OPEN_FOLDER, _("Open folder"),    "gtk-directory"],
+            [CUSTOM_ITEM_DO_NOTHING,  _("Do nothing"),     "gtk-cancel"]
+        ]
+
         AppChooserButton.__init__(self, **descriptor)
-        chooser = self.gtk_widget
-        self.content_type = chooser.get_content_type()
 
         # Fetch preferences for this content type.
         pref_start_app   = self.get_preference(PREF_MEDIA_AUTORUN_X_CONTENT_START_APP)
@@ -38,32 +44,21 @@ class MediaAppChooserButton(AppChooserButton):
         # If none of the other options are chosen, fallback to asking the user.
         pref_ask = not pref_start_app and not pref_ignore and not pref_open_folder
 
-        # Append the separator only if we have >= 1 apps in the chooser.
-        if chooser.get_app_info():
-            chooser.append_separator()
-
-        # Build extra menu options.
-        chooser.append_custom_item(CUSTOM_ITEM_ASK,         _("Ask what to do"), Gio.ThemedIcon.new("gtk-dialog-question"))
-        chooser.append_custom_item(CUSTOM_ITEM_OPEN_FOLDER, _("Open folder"),    Gio.ThemedIcon.new("gtk-directory"))
-        chooser.append_custom_item(CUSTOM_ITEM_DO_NOTHING,  _("Do nothing"),     Gio.ThemedIcon.new("gtk-cancel"))
-
-        self.gtk_widget.set_show_dialog_item(descriptor.get("dialog",  True))
-
         if pref_ask:
-            chooser.set_active_custom_item(CUSTOM_ITEM_ASK)
+            self.set_active_custom_item(CUSTOM_ITEM_ASK)
         elif pref_ignore:
-            chooser.set_active_custom_item(CUSTOM_ITEM_DO_NOTHING)
+            self.set_active_custom_item(CUSTOM_ITEM_DO_NOTHING)
         elif pref_open_folder:
-            chooser.set_active_custom_item(CUSTOM_ITEM_OPEN_FOLDER)
+            self.set_active_custom_item(CUSTOM_ITEM_OPEN_FOLDER)
 
-        chooser.connect("changed", self.on_changed)
-        chooser.connect("custom-item-activated", self.on_custom_item_activated)
+        self.connect("changed", self.on_changed)
+        self.connect("custom-item-activated", self.on_custom_item_activated)
 
     def on_changed(self, button):
         info = button.get_app_info()
         if info:
             self.set_preferences(True, False, False)
-            info.set_as_default_for_type(self.content_type)
+            info.set_as_default_for_type(self.get_content_type())
 
     def on_custom_item_activated(self, button, item):
         if item == CUSTOM_ITEM_ASK:
@@ -76,11 +71,11 @@ class MediaAppChooserButton(AppChooserButton):
     # Check for existence of this content_type in an autorun-x-content list.
     def get_preference(self, settings_key):
         strv = settings.get_strv(settings_key)
-        return strv != None and self.content_type in strv
+        return strv != None and self.get_content_type() in strv
     # Update an autorun-x-content list to include or not include this content_type.
     def set_preference(self, pref_value, settings_key):
         array = settings.get_strv(settings_key)
-        content_type = self.content_type
+        content_type = self.get_content_type()
         array = [ v for v in array if v != content_type ]
         if pref_value:
             array.append(content_type)

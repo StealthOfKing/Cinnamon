@@ -97,7 +97,7 @@ class Widget(object):
             if dependency["validator"](dependency["settings"].get_value(dependency["key"]).unpack()) == dependency["negate"]:
                 enabled = False
                 break
-        self.set_sensitive(enabled)
+        super(self.__class__, self).set_sensitive(enabled)
 
     def on_dependency_changed(self, settings, key):   # Called when a dependency changes.
         self.validate_dependencies()

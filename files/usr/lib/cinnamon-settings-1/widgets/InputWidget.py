@@ -21,61 +21,43 @@ import Settings
 COLUMN_SPACING = 4
 ROW_SPACING = 2
 
-class InputWidget(Gtk.Grid, Widget):
+class InputWidget(Widget):
     settings = False
     lock_width = True
-    column = 0
-    row = 0
 
-    #gtk_prefix
-    #gtk_widget
-    #gtk_suffix
+    #prefix
+    #suffix
 
-    def __init__(self, gtk_widget, **descriptor):
+    def __init__(self, **descriptor):
         # Fixes some widgets... inparticular ComboBox.
-        descriptor["align"] = descriptor.get("align", [0,0.5])
+#        descriptor["align"] = descriptor.get("align", [0,0.5])
 
         # Automatically indent widgets with dependencies.
         if not "indent" in descriptor and "depends" in descriptor:
             self.indent = self.indent + 1
 
-        Gtk.Grid.__init__(self)
         Widget.__init__(self, **descriptor)
 
-        self.set_column_spacing(COLUMN_SPACING)
-        self.set_row_spacing(ROW_SPACING)
-
+#        self.set_column_spacing(COLUMN_SPACING)
+#        self.set_row_spacing(ROW_SPACING)
 
         # Prefix, typically used for label.
-        gtk_prefix = descriptor.pop("label", descriptor.pop("prefix", None))
-        if gtk_prefix != None:
-            if type(gtk_prefix) == str:
-                gtk_prefix = Label(markup_with_mnemonic=gtk_prefix)
-            if gtk_prefix.get_mnemonic_keyval() and gtk_widget:
-                gtk_prefix.set_mnemonic_widget(gtk_widget)
-            self.attach(gtk_prefix, 0, self.row, 1, 1)
-            self.gtk_prefix = gtk_prefix
-        elif self.lock_width:   # A placeholder... the other option is to
-            # recode the way containers add widgets and lock column widths.
-            gtk_prefix = Gtk.Box()
-            self.attach(gtk_prefix, 0, self.row, 1, 1)
-            self.gtk_prefix = gtk_prefix
-
-        # Add the widget inbetween prefix and suffix.
-        if gtk_widget:
-            self.gtk_widget = gtk_widget
-            gtk_widget.set_valign(Gtk.Align.CENTER)
-            self.attach(gtk_widget, 1, self.row, 1, 1)
+        prefix = descriptor.pop("label", descriptor.pop("prefix", None))
+        if prefix != None:
+            if type(prefix) == str:
+                prefix = Label(markup_with_mnemonic=prefix)
+            if prefix.get_mnemonic_keyval():
+                prefix.set_mnemonic_widget(self)
+            self.prefix = prefix
 
         # Suffix, typically used for units.
-        gtk_suffix = descriptor.pop("units", descriptor.pop("suffix", None))
-        if gtk_suffix != None:
-            if type(gtk_suffix) == str:
-                gtk_suffix = Label(markup_with_mnemonic=gtk_suffix)
-            if gtk_suffix.get_mnemonic_keyval() and gtk_widget:
-                gtk_suffix.set_mnemonic_widget(gtk_widget)
-            self.attach(gtk_suffix, 2, self.row, 1, 1)
-            self.gtk_suffix = gtk_suffix
+        suffix = descriptor.pop("units", descriptor.pop("suffix", None))
+        if suffix != None:
+            if type(suffix) == str:
+                suffix = Label(markup_with_mnemonic=suffix)
+            if suffix.get_mnemonic_keyval():
+                suffix.set_mnemonic_widget(self)
+            self.suffix = suffix
 
         # Setting?
         if "setting" in descriptor:
@@ -83,15 +65,15 @@ class InputWidget(Gtk.Grid, Widget):
             self.setting_handler = self.settings.connect("changed::"+self.key, self.on_file_changed)
 
         if "changed" in descriptor:
-            gtk_widget.connect("changed", partial(descriptor["changed"], self))
+            self.connect("changed", partial(descriptor["changed"], self))
 
         # Set the initial value for this widget.
         if "value" in descriptor:
-            self.set_value(descriptor["value"])
+            self._set_value(descriptor["value"])
         elif self.settings:
             variant = self.settings.get_value(self.key)
             self.type = variant.get_type_string()
-            self.set_value(variant.unpack())
+            self._set_value(variant.unpack())
 
     def load_value(self):   # Load value from disk.
         try:
@@ -106,7 +88,17 @@ class InputWidget(Gtk.Grid, Widget):
             print ("Could not set current value for key '%s' in xlet '%s'" % (self.key, self.settings.schema))
             print e
 
-    def on_changed(self, gtk_widget):   # Called when the input value changes.
-        self.save_value(self.get_value())
+    def on_changed(self):   # Called when the input value changes.
+        self.save_value(self._get_value())
     def on_file_changed(self, settings, key):   # Called when the file's value changes.
-        self.set_value(self.load_value())
+        self._set_value(self.load_value())
+
+    def set_sensitive(self, flag):
+        print "setting sensitivity..."
+        if hasattr(self, "prefix"):
+            print "setting prefix"
+            Gtk.Widget.set_sensitive(self.prefix, flag)
+        Gtk.Widget.set_sensitive(self, flag)
+        if hasattr(self, "suffix"):
+            Gtk.Widget.set_sensitive(self.suffix, flag)
+

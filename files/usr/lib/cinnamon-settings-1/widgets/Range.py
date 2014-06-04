@@ -12,8 +12,8 @@ class Range(InputWidget):
         if "setting" in descriptor:
             self.changed = self.gtk_widget.connect('value-changed', self.on_changed)
 
-    def get_value(self):
+    def _get_value(self):
         return self.gtk_widget.get_value()
-    def set_value(self, value):
+    def _set_value(self, value):
         self.gtk_widget.set_value(value)
 

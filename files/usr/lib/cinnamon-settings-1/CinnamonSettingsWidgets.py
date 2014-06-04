@@ -35,6 +35,7 @@ try:
     sys.path.append('./bin')
     sys.path.append('./widgets')
 
+    # Populate CSW namespace with all widgets.
     from AppChooserButton import AppChooserButton
     from Background import Background
     from Box import Box
@@ -48,11 +49,14 @@ try:
     from HBox import HBox
     from Label import Label
     from MediaAppChooserButton import MediaAppChooserButton
+    from Menu import Menu
     from Scale import Scale
     from Section import Section
     from Separator import Separator
     import Settings
     from SpinButton import SpinButton
+    from Stack import Stack
+    from Table import Table
     from VBox import VBox
 except Exception, e:
     print e

@@ -13,7 +13,7 @@ class FontButton(InputWidget):
         if "setting" in descriptor:
             self.gtk_widget.connect('font-set', self.on_changed)
 
-    def get_value(self):
+    def _get_value(self):
         return self.gtk_widget.get_font_name()
-    def set_value(self, value):
+    def _set_value(self, value):
         self.gtk_widget.set_font_name(value)

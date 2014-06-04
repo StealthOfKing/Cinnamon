@@ -142,10 +142,12 @@ class Module(CSW.Module):
 
 import sys
 sys.path.append('../widgets')
+from gi.repository import Gtk
 from InputWidget import InputWidget
 
-class TitleBarButtonsOrderSelector(InputWidget):
+class TitleBarButtonsOrderSelector(Gtk.Grid, InputWidget):
     fallback = ""
+    lock_width = False
 
     def __init__(self, **descriptor):
         descriptor["setting"] = "org.cinnamon.muffin/button-layout"
@@ -157,7 +159,8 @@ class TitleBarButtonsOrderSelector(InputWidget):
                 widget = CSW.ComboBox(options=title_bar_buttons)
                 widgets.append(widget)
 
-        InputWidget.__init__(self, None, **descriptor)
+        Gtk.Grid.__init__(self)
+        InputWidget.__init__(self, **descriptor)
 
         self.attach(CSW.Label(label=_("Left side title bar buttons" )), 0, 0, 1, 1)
         self.attach(CSW.Label(label=_("Right side title bar buttons")), 0, 1, 1, 1)
@@ -166,11 +169,11 @@ class TitleBarButtonsOrderSelector(InputWidget):
             widgets = self.widgets[i]
             for j in range(4):
                 self.attach(widgets[j], j+1, i, 1, 1)
-                widgets[j].gtk_widget.connect("changed", self.on_changed)
+                widgets[j].connect("changed", self.on_changed)
 
-    def get_value(self):
-        return ','.join(widget.get_value() for widget in self.widgets[0]) + ':' + ','.join(widget.get_value() for widget in self.widgets[1])
-    def set_value(self, value):
+    def _get_value(self):
+        return ','.join(widget._get_value() for widget in self.widgets[0]) + ':' + ','.join(widget._get_value() for widget in self.widgets[1])
+    def _set_value(self, value):
         split = value.split(':')
         if not len(split):
             split = ["",""]
@@ -179,4 +182,4 @@ class TitleBarButtonsOrderSelector(InputWidget):
             items = items.split(',') if len(items) > 0 else []
             widgets = self.widgets[i]
             for j in range(4):
-                widgets[j].set_value(items[j] if j < len(items) else "")
+                widgets[j]._set_value(items[j] if j < len(items) else "")
