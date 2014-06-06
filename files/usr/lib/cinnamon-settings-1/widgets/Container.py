@@ -2,21 +2,13 @@
 
 # Generic widget container.
 
-# All Containers have a unique property, lock_widths. lock_widths controls
-# the number of InputWidget columns to width lock via Gtk.SizeGroup.
-#
-#     container.lock_widths = 0 # no width lock
-#                             1 # width lock gtk_prefix
-#                             2 # width lock gtk_prefix, gtk_widget
-#                             3 # width lock gtk_prefix, gtk_widget, gtk_suffix
-#
-# Each Container's lock_widths can be overriden on a per Widget basis, using
-# the widget property lock_width.
-#
-#     widget.lock_width = True  # allow the parent container to width lock this widget
+# All CSW container classes are variations of Gtk.Grid. To control how a
+# widget is added to a container (column width locked or otherwise) use:
+#     widget.grid_align = True  # allow the parent container to width lock this widget
 #                         False # do not width lock any widget components
 
 from gi.repository import Gtk
+from InputWidget import InputWidget
 from Widget import Widget
 
 COLUMN_SPACING=2
@@ -28,16 +20,19 @@ HORIZONTAL_RIGHT_INDENT=0
 VERTICAL_LEFT_INDENT=40
 VERTICAL_RIGHT_INDENT=40
 
-class Container(Gtk.Grid, Widget):
+class Container(Widget, Gtk.Grid):
     column = 0  # Current column number.
+    columns = 99
     row = 0 # Current row number.
     indent_children = True
     expand_children = False
 
     def __init__(self, **descriptor):
-        descriptor["expand"] = descriptor.get("expand", [True, True])
-
         Gtk.Grid.__init__(self)
+
+        descriptor["align"] = descriptor.get("align", [-1,-1])
+        descriptor["expand"] = descriptor.get("expand", [True, False])
+
         Widget.__init__(self, **descriptor)
 
         self.set_column_spacing(COLUMN_SPACING)
@@ -58,78 +53,77 @@ class Container(Gtk.Grid, Widget):
             self.column = self.column + 1
 
     def add_widget(self, widget, column, row):
-        print "add_widget(..."+str(column)+", "+str(row)+")"
-        if widget.lock_width:
-            print "    "+str(type(widget))
+        print str(type(self))+".add_widget(..., "+str(type(widget))+", "+str(column)+", "+str(row)+")"
+        if widget.grid_align:   # Add widget components to individual grid cells.
+            print "    aligned"
             if hasattr(widget, "prefix"):
                 self.attach(widget.prefix, column, row, 1, 1)
-                if self.indent_children:
-                    widget.prefix.set_margin_left(widget.margin[3] + VERTICAL_LEFT_INDENT * widget.indent)
                 column = column + 1
-            else:
-                if self.indent_children:
-                    widget.set_margin_left(widget.margin[3] + VERTICAL_LEFT_INDENT * widget.indent)
 
-            if self.expand_children:
-                widget.set_hexpand(True)
-                widget.set_halign(Gtk.Align.FILL)
             self.attach(widget, column, row, 1, 1)
             column = column + 1
 
             if hasattr(widget, "suffix"):
                 self.attach(widget.suffix, column, row, 1, 1)
-                if self.indent_children:
-                    widget.suffix.set_margin_right(widget.margin[1] + VERTICAL_RIGHT_INDENT)
                 column = column + 1
-            else:
-                if self.indent_children:
-                    widget.set_margin_right(widget.margin[1] + VERTICAL_RIGHT_INDENT)
+        else:   # Wrap widget components with box and add to grid.
+            if hasattr(widget, "prefix") or hasattr(widget, "suffix"):
+                print "    wrapped"
+                wrapper = Gtk.Grid()
+                wrapper.set_valign(widget.get_valign())
+                wrapper.set_vexpand(widget.get_vexpand())
+                widget.wrapper = wrapper
 
-            # Fixes how grid allocates extra space, helping tightly pack
-            # components according to their intended definitions.
-            box = Gtk.Box()
-            box.set_hexpand(True)
-            self.attach(box, 3, row, 1, 1)
+                c = 0
+                if hasattr(widget, "prefix"):
+                    wrapper.attach(widget.prefix, c, 0, 1, 1)
+                    c = c + 1
+
+                wrapper.attach(widget, c, 0, 1, 1)
+                c = c + 1
+
+                if hasattr(widget, "suffix"):
+                    wrapper.attach(widget.suffix, c, 0, 1, 1)
+                    c = c + 1
+
+                widget = wrapper
+            self.attach(widget, column, row, 3, 1)
+            column = column + 3
+        return column
+
+    def add_row(self, widgets, column, row, indent_children):
+        for widget in widgets:
+            column = self.add_widget(widget, column, row)
+        # Fixes how grid allocates extra space, helping tightly pack
+        # components according to their intended definitions.
+        if column < 3:
+            last = Gtk.Grid()
+            last.set_hexpand(True)
+            self.attach(last, 2, row, 1, 1)
         else:
-            container = Gtk.Grid()
-            if self.indent_children:
-                container.set_margin_right(widget.margin[1] + VERTICAL_RIGHT_INDENT)
-                container.set_margin_left (widget.margin[3] + VERTICAL_LEFT_INDENT * widget.indent)
-            c = 0
-            if hasattr(widget, "prefix"):
-                container.attach(widget.prefix, c, 0, 1, 1)
-                c = c + 1
-            container.attach(widget, c, 0, 1, 1)
-            c = c + 1
-            if hasattr(widget, "suffix"):
-                container.attach(widget.suffix, c, 0, 1, 1)
-                c = c + 1
-            self.attach(container, column, row, 4, 1)
-            column = column + 4
+            last = widgets[-1]
+        if indent_children:
+            widgets[0].set_margin_left(widgets[ 0].margin[3] + VERTICAL_LEFT_INDENT * widgets[0].indent)
+            last.set_margin_right(widgets[-1].margin[1] + VERTICAL_RIGHT_INDENT)
         return column
 
     def add_vertical(self, *widgets, **descriptor):   # Add widgets vertically (++rows).
-        columns = descriptor.get("columns", 3)
-        column, row = descriptor.get("column", 0), self.row
+        indent_children = descriptor.get("indent_children", self.indent_children)
+        columns = descriptor.get("columns", self.columns)
+        column = descriptor.get("column", 0)
+        row = self.row
         for widget in widgets:
             if type(widget) == list:    # Add row of widgets.
-                if (self.indent_children):
-                    widget[0].set_margin_left(widget[0].margin[3] + VERTICAL_LEFT_INDENT * widget[0].indent)
-                for w in widget:
-                    column = self.add_widget(w, column, row) % columns
-                    if column == 0:
-                        row = row + 1
-                if (self.indent_children):
-                    w.set_margin_right(w.margin[1] + VERTICAL_RIGHT_INDENT)
+                self.add_row(widget, column, row, indent_children)
             else:   # Individual widget.
-                column = self.add_widget(widget, column, row)
-            column = 0
+                self.add_row([widget], column, row, indent_children)
             row = row + 1
-        self.column, self.row = column, row
+        self.row = row
         return self
 
     def add(self, *widgets, **descriptor):    # Add widgets based on current orientation.
         if self.get_orientation() == Gtk.Orientation.HORIZONTAL:
+            # TODO: add_horizontal has not been maintained or checked for correctness.
             self.add_horizontal(*widgets)
         else:
             self.add_vertical(*widgets, **descriptor)

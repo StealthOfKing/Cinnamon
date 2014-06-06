@@ -2,6 +2,7 @@
 
 # Widget is a simple class for implementing Setting based dependencies
 # and other properties common to both InputWidgets and Containers.
+# Widget should not impose any default parameters.
 
 from gi.repository import Gtk
 import Settings
@@ -34,11 +35,10 @@ def get_align(align):
 class Widget(object):
     indent = 1
     margin = [0,0,0,0]
-    lock_width = False
+    grid_align = False
 
     def __init__(self, **descriptor):
-        # Dependencies?
-        if "depends" in descriptor:
+        if "depends" in descriptor: # Dependencies?
             self.dependencies = []
             depends = descriptor["depends"]
             enabled = True
@@ -54,28 +54,28 @@ class Widget(object):
                 self.dependencies.append({ "settings":settings, "key":key, "negate":negate, "validator":validator })
             self.set_sensitive(enabled)
 
-        if "align" in descriptor:
+        if "align" in descriptor:   # Alignment (start,center,end,fill).
             align = descriptor["align"]
             self.set_halign(get_align(align[0]))
             self.set_valign(get_align(align[1]))
 
-        if "classes" in descriptor:
+        if "classes" in descriptor: # CSS classes ([class,...]).
             classes = descriptor["classes"]
             style_context = self.get_style_context()
             for c in classes:
                 style_context.add_class(c)
 
-        if "expand" in descriptor:
+        if "expand" in descriptor:  # Expansion (True,False).
             self.set_hexpand(descriptor["expand"][0])
             self.set_vexpand(descriptor["expand"][1])
 
-        if "indent" in descriptor:
+        if "indent" in descriptor:  # Indent count (integer).
             self.indent = descriptor["indent"]
         
-        if "lock_width" in descriptor:
-            self.lock_width = descriptor["lock_width"]
+        if "grid_align" in descriptor:
+            self.grid_align = descriptor["grid_align"]
 
-        if "margin" in descriptor:
+        if "margin" in descriptor:  # Margin ([top,right,bottom,left]).
             margin = descriptor["margin"]
             self.margin = margin
             self.set_margin_top   (margin[0])
@@ -83,7 +83,7 @@ class Widget(object):
             self.set_margin_bottom(margin[2])
             self.set_margin_left  (margin[3])
 
-        if "tooltip" in descriptor:
+        if "tooltip" in descriptor: # Tooltip text (string).
             self.set_tooltip_text(descriptor["tooltip"])
 
         # Events
@@ -97,7 +97,7 @@ class Widget(object):
             if dependency["validator"](dependency["settings"].get_value(dependency["key"]).unpack()) == dependency["negate"]:
                 enabled = False
                 break
-        super(self.__class__, self).set_sensitive(enabled)
+        self.set_sensitive(enabled)
 
     def on_dependency_changed(self, settings, key):   # Called when a dependency changes.
         self.validate_dependencies()

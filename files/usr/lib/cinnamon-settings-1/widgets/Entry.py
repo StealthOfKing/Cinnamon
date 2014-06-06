@@ -5,7 +5,7 @@
 from gi.repository import Gtk
 from InputWidget import InputWidget
 
-class Entry(Gtk.Entry, InputWidget):
+class Entry(InputWidget, Gtk.Entry):
     fallback = ""
 
     def __init__(self, **descriptor):

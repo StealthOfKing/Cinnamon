@@ -5,7 +5,7 @@
 from gi.repository import Gtk
 from Widget import Widget
 
-class Stack(Gtk.Stack, Widget):
+class Stack(Widget, Gtk.Stack):
     def __init__(self, **descriptor):
         Gtk.Stack.__init__(self)
         Widget.__init__(self, **descriptor)

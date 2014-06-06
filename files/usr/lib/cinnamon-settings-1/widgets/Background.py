@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# Scrollable container with some styling, houses all settings.
+# Scrollable container with some styling.
+
+# Used for all settings modules with only one page (no tabs).
 
 from gi.repository import Gtk
 
@@ -10,8 +12,4 @@ class Background(Gtk.Viewport):
         self.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         style = self.get_style_context()
         style.add_class("section-bg")
-        self.set_halign(Gtk.Align.FILL)
-        self.set_valign(Gtk.Align.FILL)
-        self.set_hexpand(True)
-        self.set_vexpand(True)
 

@@ -5,11 +5,15 @@
 from gi.repository import Gtk
 from Widget import Widget
 
-class Label(Gtk.Label, Widget):
-    def __init__(self, *args, **descriptor):
-        descriptor["align"] = descriptor.pop("align", [0,0.5])
+class Label(Widget, Gtk.Label):
+    grid_align = False
 
+    def __init__(self, *args, **descriptor):
         Gtk.Label.__init__(self)
+
+        descriptor["align" ] = descriptor.get("align" , [0,-1])
+        descriptor["expand"] = descriptor.get("expand", [False,False])
+
         Widget.__init__(self, **descriptor)
 
         if "label" in descriptor:

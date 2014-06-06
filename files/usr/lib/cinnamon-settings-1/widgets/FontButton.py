@@ -5,15 +5,17 @@
 from gi.repository import Gtk
 from InputWidget import InputWidget
 
-class FontButton(InputWidget):
+class FontButton(InputWidget, Gtk.FontButton):
     fallback = "sans serif"
 
     def __init__(self, **descriptor):
-        InputWidget.__init__(self, Gtk.FontButton(), **descriptor)
+        Gtk.FontButton.__init__(self)
+        InputWidget.__init__(self, **descriptor)
         if "setting" in descriptor:
-            self.gtk_widget.connect('font-set', self.on_changed)
+            self.connect('font-set', FontButton.on_changed)
 
     def _get_value(self):
-        return self.gtk_widget.get_font_name()
+        return self.get_font_name()
     def _set_value(self, value):
-        self.gtk_widget.set_font_name(value)
+        self.set_font_name(value)
+

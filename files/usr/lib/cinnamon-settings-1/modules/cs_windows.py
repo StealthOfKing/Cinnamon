@@ -54,7 +54,7 @@ class Module(CSW.Module):
                 )
             ),
             CSW.Separator(),
-            CSW.Section(_("Title Bar"), lock_widths=2).add(
+            CSW.Section(_("Title Bar")).add(
                 TitleBarButtonsOrderSelector(),
                 CSW.ComboBox(
                     setting = "org.cinnamon.desktop.wm.preferences/action-double-click-titlebar",
@@ -121,7 +121,7 @@ class Module(CSW.Module):
                 )
             ),
             CSW.Separator(),
-            CSW.Section(_("Moving and Resizing Windows"), lock_widths=2).add(
+            CSW.Section(_("Moving and Resizing Windows")).add(
                 CSW.ComboBox(
                     setting = "org.cinnamon.desktop.wm.preferences/mouse-button-modifier",
                     label   = _("Special key to move windows"),
@@ -147,7 +147,7 @@ from InputWidget import InputWidget
 
 class TitleBarButtonsOrderSelector(Gtk.Grid, InputWidget):
     fallback = ""
-    lock_width = False
+    grid_align = False
 
     def __init__(self, **descriptor):
         descriptor["setting"] = "org.cinnamon.muffin/button-layout"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Specialised class for loading Gtk widgets written in C.
+# Specialised module for loading Gtk widgets written in C.
 
 import capi
 from gi.repository import Gtk
@@ -12,7 +12,7 @@ def CWidget(name):
         widget = c_manager.get_c_widget(name)
         widget.indent = 1
         widget.margin = [0,0,0,0]
-        widget.lock_width = False
+        widget.grid_align = False
         return widget
     except Exception, detail:
         print detail            

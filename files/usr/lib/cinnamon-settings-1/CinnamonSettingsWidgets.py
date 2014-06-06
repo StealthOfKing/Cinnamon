@@ -77,4 +77,4 @@ class Module:
 
     def add(self, *widgets):
         for widget in widgets:
-            self.gtk_box.add(widget)
+            self.gtk_grid.add(widget)

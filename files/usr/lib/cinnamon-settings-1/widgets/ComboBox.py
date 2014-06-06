@@ -8,7 +8,7 @@ from InputWidget import InputWidget
 # Load icon theme.
 icon_theme = Gtk.IconTheme.get_default()
 
-class ComboBox(Gtk.ComboBox, InputWidget):
+class ComboBox(InputWidget, Gtk.ComboBox):
     icons = False
 
     def __init__(self, **descriptor):
@@ -17,8 +17,8 @@ class ComboBox(Gtk.ComboBox, InputWidget):
         options = descriptor.get("options", False)
         # Derive model type from first option's value.
         value_type = type(options[0][0]) if options else str
-        if descriptor.get("icons", False):  # value/label/icon
-            self.icons = True
+        self.icons = descriptor.get("icons", False)
+        if self.icons:  # value/label/icon
             model = Gtk.ListStore(value_type, str, GdkPixbuf.Pixbuf)
         else:   # value/label
             model = Gtk.ListStore(value_type, str)

@@ -7,13 +7,13 @@ from InputWidget import InputWidget
 class Range(InputWidget):
     fallback = 0
 
-    def __init__(self, gtk_widget, **descriptor):
-        InputWidget.__init__(self, gtk_widget, **descriptor)
+    def __init__(self, **descriptor):
+        InputWidget.__init__(self, **descriptor)
         if "setting" in descriptor:
-            self.changed = self.gtk_widget.connect('value-changed', self.on_changed)
+            self.changed = self.connect('value-changed', Range.on_changed)
 
     def _get_value(self):
-        return self.gtk_widget.get_value()
+        return self.get_value()
     def _set_value(self, value):
-        self.gtk_widget.set_value(value)
+        self.set_value(value)
 

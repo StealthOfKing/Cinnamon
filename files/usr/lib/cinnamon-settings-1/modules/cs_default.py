@@ -84,7 +84,7 @@ class Module(CSW.Module):
             CSW.Section(
                 CSW.Label(
                     markup = "<b>%s</b>" % _("Select preferred applications for file types"),
-                    align  = [0.5,0.5],
+                    align  = [0.5,-1],
                     margin = [0,0,8,0]
                 ),
                 indent_children = False
@@ -111,9 +111,10 @@ class Module(CSW.Module):
             CSW.Section(
                 CSW.Label(
                     markup = "<b>%s</b>" % _("Select how media should be handled"),
-                    align  = [0.5,0.5],
+                    align  = [0.5,-1],
                     margin = [0,0,8,0]
                 ),
+                expand          = [True,True],
                 indent_children = False
             ).add(
                 CSW.Table(
@@ -134,7 +135,9 @@ class Module(CSW.Module):
                 ),
                 CSW.CheckButton(
                     setting = "org.cinnamon.desktop.media-handling/autorun-never",
-                    label   = _("_Never prompt or start programs on media insertion")
+                    label   = _("_Never prompt or start programs on media insertion"),
+                    expand  = [False,True],
+                    align   = [0,1]
                 )
             )
         )

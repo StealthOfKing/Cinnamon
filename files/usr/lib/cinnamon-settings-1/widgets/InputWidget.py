@@ -23,7 +23,7 @@ ROW_SPACING = 2
 
 class InputWidget(Widget):
     settings = False
-    lock_width = True
+    grid_align = True
 
     #prefix
     #suffix
@@ -35,8 +35,6 @@ class InputWidget(Widget):
         # Automatically indent widgets with dependencies.
         if not "indent" in descriptor and "depends" in descriptor:
             self.indent = self.indent + 1
-
-        Widget.__init__(self, **descriptor)
 
 #        self.set_column_spacing(COLUMN_SPACING)
 #        self.set_row_spacing(ROW_SPACING)
@@ -58,6 +56,8 @@ class InputWidget(Widget):
             if suffix.get_mnemonic_keyval():
                 suffix.set_mnemonic_widget(self)
             self.suffix = suffix
+
+        Widget.__init__(self, **descriptor)
 
         # Setting?
         if "setting" in descriptor:
@@ -93,10 +93,22 @@ class InputWidget(Widget):
     def on_file_changed(self, settings, key):   # Called when the file's value changes.
         self._set_value(self.load_value())
 
+
+    def set_margin_left(self, value):
+        Gtk.Widget.set_margin_left(
+            self.wrapper if hasattr(self, "wrapper") else
+            self.prefix if hasattr(self, "prefix") else
+            self,
+        value)
+    def set_margin_right(self, value):
+        Gtk.Widget.set_margin_right(
+            self.wrapper if hasattr(self, "wrapper") else
+            self.suffix if hasattr(self, "suffix") else
+            self,
+        value)
+
     def set_sensitive(self, flag):
-        print "setting sensitivity..."
         if hasattr(self, "prefix"):
-            print "setting prefix"
             Gtk.Widget.set_sensitive(self.prefix, flag)
         Gtk.Widget.set_sensitive(self, flag)
         if hasattr(self, "suffix"):

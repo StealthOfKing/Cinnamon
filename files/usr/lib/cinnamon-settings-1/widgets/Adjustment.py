@@ -6,19 +6,11 @@
 from gi.repository import Gtk
 
 def Adjustment(**descriptor):
-    value = 0
-    if "value" in descriptor:
-        value = descriptor["value"]
-    min = 0
-    if "min" in descriptor:
-        min = descriptor["min"]
-    max = 100
-    if "max" in descriptor:
-        max = descriptor["max"]
-    step = 1
-    if "step" in descriptor:
-        step = descriptor["step"]
-    page = 10
-    if "page" in descriptor:
-        page = descriptor["page"]
-    return Gtk.Adjustment(value, min, max, step, page, 0)
+    return Gtk.Adjustment(
+        descriptor.get("value", 0),
+        descriptor.get("min",   0),
+        descriptor.get("max", 100),
+        descriptor.get("step",  1),
+        descriptor.get("page", 10),
+        0
+    )

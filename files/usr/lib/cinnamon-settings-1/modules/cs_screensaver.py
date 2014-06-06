@@ -31,7 +31,7 @@ class Module(CSW.Module):
                     label   = _("Lock the computer when put to sleep"),
                     tooltip = _("Enable this option to require a password when the computer wakes up from suspend")
                 ),
-                CSW.HBox().add(
+                [
                     CSW.CheckButton(
                         setting = "org.cinnamon.desktop.screensaver/lock-enabled",
                         label   = _("Lock the computer when the screen turns off "),
@@ -54,7 +54,7 @@ class Module(CSW.Module):
                         ],
                         tooltip = _("This option defines the amount of time to wait before locking the screen, after showing the screensaver or after turning off the screen")
                     )
-                )
+                ]
             ),
             CSW.Separator(),
             CSW.Section(_("Away Message")).add(

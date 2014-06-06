@@ -6,7 +6,7 @@ from gi.repository import Gtk
 from Adjustment import Adjustment
 from InputWidget import InputWidget
 
-class SpinButton(Gtk.SpinButton, InputWidget):
+class SpinButton(InputWidget, Gtk.SpinButton):
     fallback = 0
 
     def __init__(self, **descriptor):
@@ -19,7 +19,7 @@ class SpinButton(Gtk.SpinButton, InputWidget):
         )
 
         InputWidget.__init__(self, **descriptor)
-        self.set_halign(Gtk.Align.FILL)
+
         if "setting" in descriptor:
             self.changed = self.connect('changed', SpinButton.on_changed)
 

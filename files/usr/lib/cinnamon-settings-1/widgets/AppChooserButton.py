@@ -4,27 +4,27 @@
 
 # Internally Gtk.AppChooserButton uses the following model:
 #     appinfo, name, label, icon, custom, separator
+# Because of this unique model, CSW.AppChooserButton inherits nothing
+# from CSW.ComboBox despite the similarities.
 
 from gi.repository import Gio, Gtk
 from InputWidget import InputWidget
 
-class AppChooserButton(Gtk.AppChooserButton, InputWidget):
+class AppChooserButton(InputWidget, Gtk.AppChooserButton):
     also = False
 
     def __init__(self, **descriptor):
         Gtk.AppChooserButton.__init__(self, content_type=descriptor.get("content_type", ""))
+        InputWidget.__init__(self, **descriptor)
 
         if "options" in descriptor:
-            # Append the separator only if we have >= 1 apps in the chooser.
+            # Append a separator if there are apps in the chooser (presumably from content-type).
             if self.get_app_info():
                 self.append_separator()
 
             options = descriptor["options"]
             for option in sorted(options, key=lambda option:option[1]):
-                print option[0]
                 self.append_custom_item(option[0], option[1], Gio.ThemedIcon.new(option[2] if len(option) >= 3 else ""))
-
-        InputWidget.__init__(self, **descriptor)
 
         # Show selected default app at top?
         self.set_show_default_item(descriptor.get("default", True))
@@ -35,6 +35,7 @@ class AppChooserButton(Gtk.AppChooserButton, InputWidget):
         if "heading" in descriptor:
             self.set_heading(descriptor["heading"])
 
+        # List of other settings to apply this choice to.
         if "also" in descriptor:
             self.also = descriptor["also"]
             self.connect("changed", self.on_changed_also)
