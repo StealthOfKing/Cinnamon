@@ -34,10 +34,10 @@ class Module(CSW.Module):
 
     def on_module_selected(self):
         self.add(
-            CSW.Section(_("Alt-Tab")).add(
+            CSW.Section(_("Alt+Tab")).add(
                 CSW.ComboBox(
                     setting = "org.cinnamon/alttab-switcher-style",
-                    label   = _("Alt-Tab switcher style"),
+                    label   = _("Alt+Tab switcher style"),
                     options = [
                         ["icons",            _("Icons only")],
                         ["thumbnails",       _("Thumbnails only")],
@@ -50,7 +50,7 @@ class Module(CSW.Module):
                 ),
                 CSW.CheckButton(
                     setting = "org.cinnamon/alttab-switcher-enforce-primary-monitor",
-                    label   = _("Display the alt-tab switcher on the primary monitor instead of the active one")
+                    label   = _("Display the Alt+Tab switcher on the primary monitor instead of the active one")
                 )
             ),
             CSW.Separator(),
@@ -143,9 +143,10 @@ class Module(CSW.Module):
 import sys
 sys.path.append('../widgets')
 from gi.repository import Gtk
+import Container
 from InputWidget import InputWidget
 
-class TitleBarButtonsOrderSelector(Gtk.Grid, InputWidget):
+class TitleBarButtonsOrderSelector(InputWidget, Gtk.Grid):
     fallback = ""
     grid_align = False
 
@@ -160,6 +161,10 @@ class TitleBarButtonsOrderSelector(Gtk.Grid, InputWidget):
                 widgets.append(widget)
 
         Gtk.Grid.__init__(self)
+
+        self.set_column_spacing(Container.COLUMN_SPACING)
+        self.set_row_spacing(Container.ROW_SPACING)
+
         InputWidget.__init__(self, **descriptor)
 
         self.attach(CSW.Label(label=_("Left side title bar buttons" )), 0, 0, 1, 1)

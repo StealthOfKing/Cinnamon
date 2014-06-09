@@ -11,7 +11,7 @@ from gi.repository import Gtk
 from InputWidget import InputWidget
 from Widget import Widget
 
-COLUMN_SPACING=2
+COLUMN_SPACING=4
 ROW_SPACING=2
 
 HORIZONTAL_LEFT_INDENT=0

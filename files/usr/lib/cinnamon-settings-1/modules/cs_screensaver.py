@@ -60,7 +60,7 @@ class Module(CSW.Module):
             CSW.Section(_("Away Message")).add(
                 CSW.Entry(
                     setting = "org.cinnamon.screensaver/default-message",
-                    label   = _("Show this message when the screen is locked: "),
+                    label   = _("Show this message when the screen is locked"),
                     tooltip = _("This is the default message displayed on your lock screen")
                 ),
                 CSW.CheckButton(

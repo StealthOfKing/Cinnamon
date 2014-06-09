@@ -50,7 +50,6 @@ class Module(CSW.Module):
             ),
             [
                 CSW.Label(label=_("Name:")),
-                self.name_stack,
                 CSW.Button(
                     text    = _("Change..."),
                     tooltip = _("Click to change your name"),

@@ -157,43 +157,105 @@ if HAS_DEDICATED_TERMINAL_SHORTCUT:
     KEYBINDINGS.append([_("Launch terminal"), MEDIA_KEYS_SCHEMA, "terminal", False, "launchers"])
 
 class Module(CSW.Module):
+    id = "keyboard"
     name = _("Keyboard")
     tooltip = _("Manage keyboard settings and shortcuts")
     keywords = _("keyboard, shortcut, hotkey")
     icon = "cs-keyboard"
     category = "hardware"
+    tabs = [
+        { "id":"typing",    "title":_("Typing") },
+        { "id":"shortcuts", "title":_("Keyboard shortcuts") },
+        { "id":"layouts",   "title":_("Keyboard layouts") }
+    ]
 
     def on_module_selected(self):
-        self.tabs = []        
-        self.notebook = Gtk.Notebook()
-        self.notebook.expand = True
+        self.tabs["typing"].add(
+            CSW.Section().add(
+                CSW.CheckButton(
+                    setting = "org.cinnamon.settings-daemon.peripherals.keyboard/repeat",
+                    label   = _("Enable key repeat")
+                ),
+                CSW.VBox(
+                    depends = ["org.cinnamon.settings-daemon.peripherals.keyboard/repeat"]
+                ).add(
+                    CSW.Scale(
+                        setting = "org.cinnamon.settings-daemon.peripherals.keyboard/delay",
+                        label   = _("Repeat delay"),
+                        min     = 100,
+                        max     = 2000,
+                        step    = 10
+                        #marks = Short, Long
+                    ),
+                    CSW.Scale(
+                        setting     = "org.cinnamon.settings-daemon.peripherals.keyboard/repeat-interval",
+                        label       = _("Repeat speed"),
+                        logarithmic = True,
+                        inverted    = True,
+                        min         = 20,
+                        max         = 2000,
+                        step        = 1
+                        #marks = Slow, Fast
+                    )
+                )
+            ),
+            CSW.Separator(),
+            CSW.Section().add(
+                CSW.CheckButton(
+                    setting = "org.cinnamon.desktop.interface/cursor-blink",
+                    label   = _("Text cursor blinks")
+                ),
+                CSW.VBox(
+                    depends = ["org.cinnamon.desktop.interface/cursor-blink"]
+                ).add(
+                    CSW.Scale(
+                        setting  = "org.cinnamon.desktop.interface/cursor-blink-time",
+                        label    = _("Blink speed"),
+                        inverted = True,
+                        min      = 100,
+                        max      = 2500,
+                        step     = 10,
+                        #marks = Slow, Fast
+                    )
+                )
+            ),
+            CSW.Separator(),
+            CSW.Section(indent_children=False).add(
+                CSW.Label(label=_("Test Box"),align=[0.5,-1]),
+                CSW.Entry(expand=[True,False],grid_align=False)
+            )
+        )
+        return
+#        self.tabs = []        
+#        self.notebook = Gtk.Notebook()
+#        self.notebook.expand = True
 
-        tab = NotebookPage(_("Typing"), False)
-        tab.add_widget(GSettingsCheckButton(_("Enable key repeat"), "org.cinnamon.settings-daemon.peripherals.keyboard", "repeat", None))
-        box = IndentedHBox()
-        slider = GSettingsRange(_("Repeat delay:"), _("Short"), _("Long"), 100, 2000, False, "uint", False, "org.cinnamon.settings-daemon.peripherals.keyboard", "delay",
-                                                                        "org.cinnamon.settings-daemon.peripherals.keyboard/repeat", adjustment_step = 10)
-        box.pack_start(slider, True, True, 0)
-        tab.add_widget(box)
-        box = IndentedHBox()
-        slider = GSettingsRange(_("Repeat speed:"), _("Slow"), _("Fast"), 20, 2000, True, "uint", True, "org.cinnamon.settings-daemon.peripherals.keyboard", "repeat-interval",
-                                                                        "org.cinnamon.settings-daemon.peripherals.keyboard/repeat", adjustment_step = 1)
-        box.pack_start(slider, True, True, 0)
-        tab.add_widget(box)
-        tab.add_widget(Gtk.Separator.new(Gtk.Orientation.HORIZONTAL))
+#        tab = NotebookPage(_("Typing"), False)
+#        tab.add_widget(GSettingsCheckButton(_("Enable key repeat"), "org.cinnamon.settings-daemon.peripherals.keyboard", "repeat", None))
+#        box = IndentedHBox()
+#        slider = GSettingsRange(_("Repeat delay:"), _("Short"), _("Long"), 100, 2000, False, "uint", False, "org.cinnamon.settings-daemon.peripherals.keyboard", "delay",
+#                                                                        "org.cinnamon.settings-daemon.peripherals.keyboard/repeat", adjustment_step = 10)
+#        box.pack_start(slider, True, True, 0)
+#        tab.add_widget(box)
+#        box = IndentedHBox()
+#        slider = GSettingsRange(_("Repeat speed:"), _("Slow"), _("Fast"), 20, 2000, True, "uint", True, "org.cinnamon.settings-daemon.peripherals.keyboard", "repeat-interval",
+#                                                                        "org.cinnamon.settings-daemon.peripherals.keyboard/repeat", adjustment_step = 1)
+#        box.pack_start(slider, True, True, 0)
+#        tab.add_widget(box)
+#        tab.add_widget(Gtk.Separator.new(Gtk.Orientation.HORIZONTAL))
         
-        tab.add_widget(GSettingsCheckButton(_("Text cursor blinks"), "org.cinnamon.desktop.interface", "cursor-blink", None))
-        box = IndentedHBox()
-        slider = GSettingsRange(_("Blink speed:"), _("Slow"), _("Fast"), 100, 2500, True, "int", False, "org.cinnamon.desktop.interface", "cursor-blink-time",
-                                                                        "org.cinnamon.desktop.interface/cursor-blink", adjustment_step = 10)
-        box.pack_start(slider, True, True, 0)
-        tab.add_widget(box)
-        tab.add_widget(Gtk.Separator.new(Gtk.Orientation.HORIZONTAL))
-        tab.add_widget(Gtk.Label.new(_("Test Box")))
-        tab.add_widget(Gtk.Entry())
-        self.addNotebookTab(tab)
+#        tab.add_widget(GSettingsCheckButton(_("Text cursor blinks"), "org.cinnamon.desktop.interface", "cursor-blink", None))
+#        box = IndentedHBox()
+#        slider = GSettingsRange(_("Blink speed:"), _("Slow"), _("Fast"), 100, 2500, True, "int", False, "org.cinnamon.desktop.interface", "cursor-blink-time",
+#                                                                        "org.cinnamon.desktop.interface/cursor-blink", adjustment_step = 10)
+#        box.pack_start(slider, True, True, 0)
+#        tab.add_widget(box)
+#        tab.add_widget(Gtk.Separator.new(Gtk.Orientation.HORIZONTAL))
+#        tab.add_widget(Gtk.Label.new(_("Test Box")))
+#        tab.add_widget(Gtk.Entry())
+#        self.addNotebookTab(tab)
 
-        tab = NotebookPage(_("Keyboard shortcuts"), True)
+#        tab = NotebookPage(_("Keyboard shortcuts"), True)
 
         headingbox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 2)
         mainbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 2)

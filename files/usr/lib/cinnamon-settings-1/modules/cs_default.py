@@ -70,7 +70,7 @@ other_defs = {
 class Module(CSW.Module):
     id = "default"
     name = _("Preferred Applications")
-    tooltip = _("Preferred Applications")
+    tooltip = _("Manage preferred applications")
     keywords = _("media, defaults, applications, programs, removable, browser, email, calendar, music, videos, photos, images, cd, autostart, autoplay")
     icon = "cs-default-applications"
     category = "prefs"

@@ -30,14 +30,11 @@ class InputWidget(Widget):
 
     def __init__(self, **descriptor):
         # Fixes some widgets... inparticular ComboBox.
-#        descriptor["align"] = descriptor.get("align", [0,0.5])
+        descriptor["align"] = descriptor.get("align", [-1,0.5])
 
         # Automatically indent widgets with dependencies.
         if not "indent" in descriptor and "depends" in descriptor:
             self.indent = self.indent + 1
-
-#        self.set_column_spacing(COLUMN_SPACING)
-#        self.set_row_spacing(ROW_SPACING)
 
         # Prefix, typically used for label.
         prefix = descriptor.pop("label", descriptor.pop("prefix", None))
@@ -89,7 +86,10 @@ class InputWidget(Widget):
             print e
 
     def on_changed(self):   # Called when the input value changes.
-        self.save_value(self._get_value())
+        if self.type in "ynqiuxth": # Round all integer types.
+            self.save_value(round(self._get_value()))
+        else:
+            self.save_value(self._get_value())
     def on_file_changed(self, settings, key):   # Called when the file's value changes.
         self._set_value(self.load_value())
 
@@ -113,4 +113,11 @@ class InputWidget(Widget):
         Gtk.Widget.set_sensitive(self, flag)
         if hasattr(self, "suffix"):
             Gtk.Widget.set_sensitive(self.suffix, flag)
+
+    def set_tooltip_text(self, tooltip):
+        if hasattr(self, "prefix"):
+            Gtk.Widget.set_tooltip_text(self.prefix, tooltip)
+        Gtk.Widget.set_tooltip_text(self, tooltip)
+        if hasattr(self, "suffix"):
+            Gtk.Widget.set_tooltip_text(self.suffix, tooltip)
 

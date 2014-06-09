@@ -15,11 +15,11 @@ class Module(CSW.Module):
             CSW.Section(_("Desktop Scaling")).add(
                 CSW.ComboBox(
                     setting = "org.cinnamon.desktop.interface/scaling-factor",
-                    label   = _("User interface scaling:"),
+                    label   = _("User interface scaling"),
                     options = [
                         [0, _("Auto")],
                         [1, _("Normal")],
-                        [2, _("Double (Hi-DPI)")]
+                        [2, _("Double (HiDPI)")]
                     ]
                 )
             ),

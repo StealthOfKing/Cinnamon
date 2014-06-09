@@ -30,7 +30,7 @@ class Module(CSW.Module):
                 CSW.CheckButton(
                     setting = "org.cinnamon.desktop.interface/clock-show-seconds",
                     label   = _("Display seconds"),
-                    tooltip = _("Check this to show seconds on the clock")
+                    tooltip = _("Check this to display seconds on the clock")
                 )
             )
         )

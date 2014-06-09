@@ -165,12 +165,12 @@ class MainWindow:
                         tab = tabs[i]
                         viewport = Gtk.Viewport()
                         notebook.append_page(viewport, Gtk.Label.new(tab["title"]))
-                        gtk_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+                        gtk_grid = CSW.VBox(indent_children=False)
                         viewport.add(gtk_grid)
                         module.tabs[tab["id"]] = gtk_grid
                     notebook.expand = True
                 else:
-                    module.gtk_grid = Gtk.Grid(orientation=Gtk.Orientation.VERTICAL)
+                    module.gtk_grid = CSW.VBox(indent_children=False)
                     if hasattr(module, "no_background"):
                         background = module.gtk_grid
                     else:

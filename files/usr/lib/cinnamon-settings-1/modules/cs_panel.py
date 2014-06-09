@@ -32,13 +32,13 @@ class Module(CSW.Module):
             CSW.Separator()
         )
 
-        section = CSW.Section(_("Auto Hide Options"))
+        section = CSW.Section(_("Autohide Options"))
         layout_type = desktop_layout_combo_box._get_value()
         if layout_type != "classic":
             section.add(
                 CSW.CheckButton(
                     setting = "org.cinnamon/panel-autohide",
-                    label   = _("Auto-hide panel")
+                    label   = _("Autohide panel")
                 ),
                 CSW.SpinButton(
                     setting = "org.cinnamon/panel-show-delay",
@@ -58,7 +58,7 @@ class Module(CSW.Module):
         else:
             section.add(
                 CSW.CheckButton(
-                    label   = _("Auto-hide top panel"),
+                    label   = _("Autohide top panel"),
                     setting = "org.cinnamon/panel-autohide"
                 ),
                 CSW.SpinButton(
@@ -76,7 +76,7 @@ class Module(CSW.Module):
                     min=0, max=2000, step=50, page=200
                 ),
                 CSW.CheckButton(
-                    label   = _("Auto-hide bottom panel"),
+                    label   = _("Autohide bottom panel"),
                     setting = "org.cinnamon/panel2-autohide"
                 ),
                 CSW.SpinButton(
